@@ -1,0 +1,39 @@
+<?xml version ="1.0" encoding="utf-8"?>
+<!-- Copyright 2022 Sodexis
+     License OPL-1 (See LICENSE file for full copyright and licensing details). -->
+
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.account</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='show_purchase_receipts']" position="after">
+                <div class="col-12 col-lg-6 o_setting_box" id="vendor_bill_approval_request">
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Vendor Bill Approval Request</span>
+                            <div class="text-muted">
+                            </div>
+                            <div class="row mt16">
+                                <label for="threshold_for_bill_approval_indicator" string="Approval Request Based on Threshold Amount" class="col-lg-4 o_light_label"/>
+                                <field name="threshold_for_bill_approval_indicator"/>
+                            </div>
+                            <div class="row mt16"  attrs="{'invisible': [('threshold_for_bill_approval_indicator', '=',False)]}">
+                                <label for="threshold_for_bill_approval" string="Thershold amount" class="col-lg-4 o_light_label"/>
+                                <field name="threshold_for_bill_approval" class="oe_inline"/>
+                            </div>
+                            <div class="row mt16">
+                                <label for="automated_approval_request" string="Create Approval Request Automatically" class="col-lg-4 o_light_label"/>
+                                <field name="automated_approval_request"/>
+                            </div>
+                            <div class="row mt16">
+                             <label for="bill_approval_channel_id" string="Channel" class="col-lg-4 o_light_label"/>
+                             <field name="bill_approval_channel_id" class="oe_inline"/>
+                         </div>
+                        </div>
+                    </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

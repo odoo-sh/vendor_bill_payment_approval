@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<odoo>
+
+    <!-- Mail template are declared in a NOUPDATE block
+         so users can freely customize/delete them -->
+
+    <data noupdate="1">
+        <!--Email template -->
+        <record id="email_template_edi_vendor_bill_approval" model="mail.template">
+            <field name="name">Vendor Bill Payment Approval: Send by email.</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="email_from">${(object.invoice_user_id.email_formatted or user.email_formatted) |safe}</field>
+            <field name="subject">Payment Approval Requested for Bill# ${object.name}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Dear Payment Managers,
+        <br /><br />
+        Approval needed to proceed with payments for the <b>Bill# <a href="${object.get_share_url()}">${object.name}</a></b><br />
+        Please approve to proceed further.
+    </p>
+</div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

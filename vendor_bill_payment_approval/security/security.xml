@@ -1,0 +1,14 @@
+<?xml version ="1.0" encoding="utf-8"?>
+<!-- Copyright 2020 Sodexis
+     License OPL-1 (See LICENSE file for full copyright and licensing details). -->
+
+<odoo noupdate="1">
+    <record id="group_payment_manager" model="res.groups">
+        <field name="name">Payment Manager</field>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
+    </record>
+    <record id="group_payment_requester" model="res.groups">
+        <field name="name">Can Request for Payment Approval?</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>
