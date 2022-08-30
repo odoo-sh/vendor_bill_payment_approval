@@ -19,11 +19,14 @@ class AccountMove(models.Model):
 
     def vendor_bill_approval_request_message(self):
         bills = self.env['account.move'].search([('move_type','=','in_invoice'),('needs_approval','=',True),('approved','=',False)])
-        channel_id = channel_id = int(self.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.bill_approval_channel_id'))
+        channel_id = int(self.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.bill_approval_channel_id'))
         if bills and channel_id:
+            message = ''
             for bill in bills:
                 link = bill.get_share_url()
-                body = """Approval needed to proceed with payments for the <b>Bill# <a href="%s">%s</a></b>""" %(link,bill.name)
+                message += F'<br/><b><a href="{link}">{bill.name}</a></b>'
+            if message:
+                body = F"Approval needed to proceed with payments for the following Bills {message}"
                 self.env['mail.message'].create({
                 'message_type': 'comment',
                 'subtype_id': self.env.ref('mail.mt_comment').id,
