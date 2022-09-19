@@ -79,14 +79,16 @@ class AccountMove(models.Model):
         threshold_amount = float(self.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.threshold_for_bill_approval'))
         bill_approval_indicator = self.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.threshold_for_bill_approval_indicator')
         automated_approval_creation = self.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.automated_approval_request')
+        turnoff_approval_request_email = self.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.turnoff_approval_request_email')
         if self.move_type == 'in_invoice' and not self.needs_approval:
             if (bill_approval_indicator and self.amount_total >= threshold_amount) or (not bill_approval_indicator and automated_approval_creation) or (not bill_approval_indicator and not automated_approval_creation):
                 self.write({'needs_approval': True})
-                group_id = self.env['ir.model.data'].xmlid_to_res_id('vendor_bill_payment_approval.group_payment_manager', raise_if_not_found=False)
-                payment_managers = self.env['res.groups'].browse(group_id).users.partner_id
-                template = self.env.ref("vendor_bill_payment_approval.email_template_edi_vendor_bill_approval", raise_if_not_found=False)
-                if template and payment_managers:
-                    template.send_mail(self.id,force_send=True, email_values={'recipient_ids': payment_managers})
+                if not turnoff_approval_request_email:
+                    group_id = self.env['ir.model.data'].xmlid_to_res_id('vendor_bill_payment_approval.group_payment_manager', raise_if_not_found=False)
+                    payment_managers = self.env['res.groups'].browse(group_id).users.partner_id
+                    template = self.env.ref("vendor_bill_payment_approval.email_template_edi_vendor_bill_approval", raise_if_not_found=False)
+                    if template and payment_managers:
+                        template.send_mail(self.id,force_send=True, email_values={'recipient_ids': payment_managers})
             elif bill_approval_indicator and self.amount_total <= threshold_amount:
                 self.write({
                             'needs_approval': True,
