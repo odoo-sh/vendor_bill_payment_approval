@@ -48,9 +48,9 @@ class AccountMove(models.Model):
             automated_approval_creation = record.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.automated_approval_request')
             bill_approval_indicator = record.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.threshold_for_bill_approval_indicator')
             threshold_amount = float(record.env['ir.config_parameter'].sudo().get_param('vendor_bill_payment_approval.threshold_for_bill_approval'))
-            if automated_approval_creation:
+            if automated_approval_creation and not self._context.get('no_automatic_approval',False):
                 record.request_approval()
-            elif bill_approval_indicator and record.amount_total < threshold_amount:
+            elif bill_approval_indicator and record.amount_total < threshold_amount and not self._context.get('no_automatic_approval',False):
                     record.write({
                                  'needs_approval': True,
                                  'approved': True
