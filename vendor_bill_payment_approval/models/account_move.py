@@ -36,8 +36,7 @@ class AccountMove(models.Model):
                 })
 
     def action_register_payment(self):
-        active_ids = self.env.context.get('active_ids')
-        vendor_bills = self.env['account.move'].search([('id', 'in', active_ids), ('approved', '=', False), ('move_type', '=', 'in_invoice')])
+        vendor_bills = self.env['account.move'].search([('id', 'in', self.ids), ('approved', '=', False), ('move_type', '=', 'in_invoice')])
         if vendor_bills:
             raise UserError(_('All Vendor bills must be approved to proceed with the payment.\n The following vendor bills are not approved %s' % ', '.join(vendor_bills.mapped('name'))))
         return super().action_register_payment()
@@ -117,8 +116,7 @@ class AccountMove(models.Model):
                 invoice.request_approval_visibility = True
 
     def action_approve(self):
-        active_ids = self.env.context.get("active_ids", [])
-        bills = self.env["account.move"].browse(active_ids)
+        bills = self.ids
 
         # Only payment managers can approve bills
         if not self.env.user.has_group("vendor_bill_payment_approval.group_payment_manager"):
@@ -140,8 +138,7 @@ class AccountMove(models.Model):
             bill.approve()
 
     def action_request_approval(self):
-        active_ids = self.env.context.get("active_ids", [])
-        bills = self.env["account.move"].browse(active_ids)
+        bills = self.ids
 
         # Only users with the group can request for payment approval
         # are allowed to request payment approval bills
