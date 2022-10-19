@@ -116,29 +116,27 @@ class AccountMove(models.Model):
                 invoice.request_approval_visibility = True
 
     def action_approve(self):
-        bills = self.ids
 
         # Only payment managers can approve bills
         if not self.env.user.has_group("vendor_bill_payment_approval.group_payment_manager"):
             raise UserError(_("Only Payment Managers can approve bills."))
 
         # Only Vendor bills can be approved
-        if bills.filtered(lambda b: b.move_type != 'in_invoice'):
+        if self.filtered(lambda b: b.move_type != 'in_invoice'):
             raise UserError(_("Only Vendor Bills can be approved."))
 
         # Only approve the bills that needs approval
-        approval_not_requested_bills = bills.filtered(lambda b: b.move_type == "in_invoice" and b.needs_approval == False)
+        approval_not_requested_bills = self.filtered(lambda b: b.move_type == "in_invoice" and b.needs_approval == False)
         if approval_not_requested_bills:
             message = """The following bills are not requested for approval.
             %s\nDon't select the bills that are not requested for approval""" % ', '.join([b.name if b.state != 'draft' else 'ID# %s' % b.id for b in approval_not_requested_bills])
             raise UserError(_(message))
 
         # only approve the bills are not approved
-        for bill in bills.filtered(lambda b: not b.approved):
+        for bill in self.filtered(lambda b: not b.approved):
             bill.approve()
 
     def action_request_approval(self):
-        bills = self.ids
 
         # Only users with the group can request for payment approval
         # are allowed to request payment approval bills
@@ -146,16 +144,16 @@ class AccountMove(models.Model):
             raise UserError(_("Only users with the group \"Can request for payment approval\" are allowed to request payment approval."))
 
         # Only Vendor bills can be requested for approval
-        if bills.filtered(lambda b: b.move_type != 'in_invoice'):
+        if self.filtered(lambda b: b.move_type != 'in_invoice'):
             raise UserError(_("Only Vendor Bills can be requested for approval."))
 
         # Only request for approval for the bills that are in posted state
-        can_not_be_requested = bills.filtered(lambda b: b.move_type == "in_invoice" and b.state != 'posted')
+        can_not_be_requested = self.filtered(lambda b: b.move_type == "in_invoice" and b.state != 'posted')
         if can_not_be_requested:
             message = """The following bills can't be requested for approval.
             %s\nOnly posted bills can be requested for approval""" % ', '.join([b.name if b.state != 'draft' else 'ID# %s' % b.id for b in can_not_be_requested])
             raise UserError(_(message))
 
         # only approve the bills are not requested already
-        for bill in bills.filtered(lambda b: not b.needs_approval):
+        for bill in self.filtered(lambda b: not b.needs_approval):
             bill.request_approval()
